@@ -1,0 +1,43 @@
+### Проверка статус кода и типа ответа
+GET http://localhost:8080/author/list
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+
+    client.test("Response content-type is json", function () {
+        var type = response.contentType.mimeType;
+        client.assert(type === "application/json", "Expected 'application/json' but received '" + type + "'");
+    });
+%}
+
+### С незаполненным параметром perPage
+GET http://localhost:8080/author/list?perPage
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200")
+    })
+%}
+
+### Неверный метод запроса
+POST http://localhost:8080/author/list
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 405, "Response status is not 200")
+    })
+%}
+
+### Вернет 2 записи(id: 5,6)
+GET http://localhost:8080/author/list?page=3&perPage=2
+
+> {%
+    client.test("Request return data count === 2, and first ID === 5", function () {
+        client.assert(response.body['count'] == 2, "Response count != 2")
+    })
+    client.test("Request return data count === 2, and first ID === 5", function () {
+        client.assert(response.body['data'][0]['id'] == 5, "Response first user id not 5")
+    })
+%}
